@@ -1,0 +1,116 @@
+:root {
+  --bg: #07070c;
+  --panel: rgba(16, 16, 24, 0.78);
+  --line: rgba(255, 255, 255, 0.09);
+  --text: #eceaf4;
+  --muted: #8a8899;
+  --accent: #ff8c5a;
+  --accent2: #3cf0b4;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; overflow: hidden; background: var(--bg); color: var(--text);
+  font: 14px/1.4 "Segoe UI", system-ui, -apple-system, sans-serif; }
+#stage { position: fixed; inset: 0; }
+#stage canvas { display: block; }
+
+header { position: fixed; top: 18px; left: 22px; pointer-events: none; }
+header h1 { margin: 0; font-size: 26px; letter-spacing: 0.18em; font-weight: 800; }
+header h1 span { color: var(--accent); margin: 0 0.1em; }
+header p { margin: 2px 0 0; color: var(--muted); font-size: 13px; }
+
+#panel { position: fixed; right: 18px; bottom: 18px; width: 340px; max-height: calc(100vh - 36px);
+  overflow: auto; padding: 14px; background: var(--panel); border: 1px solid var(--line);
+  border-radius: 16px; backdrop-filter: blur(14px); }
+.row { display: flex; gap: 8px; }
+.row button { flex: 1; }
+
+button { cursor: pointer; border: 1px solid var(--line); background: rgba(255, 255, 255, 0.06);
+  color: var(--text); padding: 9px 12px; border-radius: 10px; font: inherit; font-weight: 600;
+  transition: background 0.15s, transform 0.1s; }
+button:hover { background: rgba(255, 255, 255, 0.12); }
+button:active { transform: scale(0.97); }
+button:disabled { opacity: 0.5; cursor: progress; }
+button.primary { background: linear-gradient(135deg, #ff8c5a, #e0603a); border-color: transparent; color: #fff; }
+button.primary:hover { filter: brightness(1.1); }
+
+.caret { display: inline-block; font-size: 11px; opacity: 0.7; transition: transform 0.15s; }
+#beats.open { background: rgba(255, 255, 255, 0.14); }
+#beats.open .caret { transform: rotate(180deg); }
+
+#beatmenu { list-style: none; margin: 10px 0 0; padding: 6px; border: 1px solid var(--line);
+  border-radius: 12px; background: rgba(0, 0, 0, 0.35); animation: drop 0.16s ease-out; }
+@keyframes drop { from { opacity: 0; transform: translateY(-4px); } }
+#beatmenu button { width: 100%; display: grid; grid-template-columns: 1fr auto; grid-template-rows: auto auto;
+  column-gap: 10px; text-align: left; padding: 8px 10px; border: 0; background: transparent; border-radius: 8px; }
+#beatmenu button:hover { background: rgba(255, 140, 90, 0.14); }
+#beatmenu .b-title { font-weight: 700; }
+#beatmenu .b-artist { grid-row: 2; color: var(--muted); font-size: 12px; font-weight: 400; }
+#beatmenu .b-state { grid-column: 2; grid-row: 1 / span 2; align-self: center; color: var(--accent2); font-size: 12px; }
+#beatmenu li.current .b-title { color: var(--accent); }
+
+#empty { color: var(--muted); margin: 12px 2px 2px; font-size: 13px; }
+
+#player { margin-top: 14px; }
+.now { display: flex; align-items: center; gap: 10px; }
+#beatdot { width: 12px; height: 12px; border-radius: 50%; flex: none;
+  background: var(--accent2); box-shadow: 0 0 12px var(--accent2); }
+#title { flex: 1; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#bpm { color: var(--muted); font-variant-numeric: tabular-nums; font-size: 12px; }
+
+.transport { display: flex; align-items: center; gap: 8px; margin-top: 12px; }
+.transport button { padding: 8px 12px; }
+button.round { width: 48px; height: 48px; border-radius: 50%; font-size: 16px; padding: 0; }
+.vol { margin-left: auto; display: flex; align-items: center; gap: 6px; color: var(--muted); }
+.vol input { width: 80px; }
+
+.seekrow { display: flex; align-items: center; gap: 8px; margin-top: 10px;
+  color: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; }
+.seekrow input { flex: 1; }
+input[type=range] { accent-color: var(--accent); }
+
+#playlist { list-style: none; margin: 12px 0 0; padding: 0; border-top: 1px solid var(--line); }
+#playlist li { display: flex; align-items: center; gap: 10px; padding: 8px 6px;
+  border-bottom: 1px solid var(--line); cursor: pointer; border-radius: 6px; }
+#playlist li:hover { background: rgba(255, 255, 255, 0.05); }
+#playlist li.active .name { color: var(--accent); }
+#playlist .idx { width: 18px; color: var(--muted); font-size: 12px; text-align: center; }
+#playlist .name { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#playlist .rm { padding: 2px 8px; font-size: 12px; background: transparent; border-color: transparent; color: var(--muted); }
+#playlist .rm:hover { color: #ff6b6b; background: rgba(255, 107, 107, 0.12); }
+
+#dropmask { position: fixed; inset: 12px; display: none; place-items: center; font-size: 22px; font-weight: 700;
+  border: 2px dashed var(--accent); border-radius: 20px; background: rgba(255, 140, 90, 0.08); pointer-events: none; }
+body.dragging #dropmask { display: grid; }
+
+#listToggle { padding: 4px 10px; font-size: 12px; color: var(--muted); }
+#player.collapsed #playlist { display: none; }
+#player.collapsed #listToggle { color: var(--text); }
+
+/* ---------- phones: panel becomes a compact bottom sheet ---------- */
+@media (max-width: 640px) {
+  html, body { height: 100dvh; }
+  header { top: calc(12px + env(safe-area-inset-top)); left: 16px; }
+  header h1 { font-size: 18px; }
+  header p { font-size: 11px; }
+
+  #panel { left: 10px; right: 10px; width: auto; bottom: calc(10px + env(safe-area-inset-bottom));
+    max-height: 52dvh; padding: 12px; border-radius: 18px; }
+  .row button { padding: 11px 10px; }          /* comfy touch targets */
+  #player { margin-top: 10px; }
+  .transport { margin-top: 8px; justify-content: center; gap: 14px; }
+  .transport button { min-width: 44px; min-height: 44px; }
+  .vol { display: none; }                      /* phones use hardware volume */
+  .seekrow { margin-top: 6px; }
+  #playlist { max-height: 30dvh; overflow: auto; }
+  #playlist li { padding: 10px 6px; }
+  #playlist .rm { padding: 6px 10px; }
+  #beatmenu { max-height: 34dvh; overflow: auto; }
+  #beatmenu button { padding: 10px; }
+}
+
+/* touch screens: no sticky hover highlights */
+@media (hover: none) {
+  button:hover { background: rgba(255, 255, 255, 0.06); }
+  button.primary:hover { filter: none; }
+  #playlist li:hover, #beatmenu button:hover { background: transparent; }
+}
